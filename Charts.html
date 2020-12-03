@@ -1,0 +1,365 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+  <meta charset="utf-8"> 
+  <meta name="viewport" 
+        content="width=device-width, 
+                 initial-scale=1, 
+                 shrink-to-fit=no"> 
+  <title> 
+    load data from json file  
+    into a bootstrap table 
+  </title> 
+  
+  <!-- Include Bootstrap for styling -->
+  <link rel="stylesheet"
+        href= 
+"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> 
+  
+  <!-- Include the Bootstrap Table CSS 
+  for the table -->
+  <link rel="stylesheet" 
+        href= 
+"https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css"> 
+
+  <!-- Include jQuery and other required 
+  files for Bootstrap -->
+  <script src= 
+"https://code.jquery.com/jquery-3.3.1.min.js"> 
+  </script> 
+  <script src= 
+"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"> 
+  </script> 
+  <script src= 
+"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"> 
+  </script> 
+  
+  <!-- Include the JavaScript file 
+  for Bootstrap table -->
+  <script src= 
+"https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"> 
+  </script> 
+
+
+<!-- Styles -->
+<style>
+#chartdiv {
+  width: 100%;
+  height: 500px;
+}
+
+</style>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+</head> 
+<body> 
+  <div class="container"> 
+    <h1 class="text text-success text-center "> 
+     Matrix presentation of Aggregated values
+    </h1> 
+      <table class="table-striped border-success"> 
+        <thead> 
+          <tr> 
+            <th data-field="testName"> 
+              <span class="text-success"> 
+               Test Name 
+              </span> 
+            </th> 
+
+           <th data-field="min"> 
+              <span class="text-success"> 
+               Min 
+              </span> 
+            </th> 
+
+            <th data-field="average"> 
+              <span class="text-success"> 
+               Average
+              </span> 
+            </th> 
+            <th data-field="max"> 
+              <span class="text-success"> 
+               Max
+              </span> 
+            </th> 
+          </tr> 
+        </thead> 
+      </table> 
+  </div> 
+
+         <!-- CREATING BOOTSTRAP MODEL -->
+        <div class="modal fade" 
+             id="gfgmodal"
+             tabindex="-1"
+             role="dialog"> 
+            <div class="modal-dialog"> 
+                <div class="modal-content"> 
+                    <div class="modal-header"> 
+                        <!-- MODEL TITLE -->
+                        <h2 class="modal-title"
+                            id="gfgmodallabel"> 
+                          Time/Value Graph of raw data</h2> 
+                        <button type="button" 
+                                class="close"
+                                data-dismiss="modal" 
+                                aria-label="Close"> 
+                            <span aria-hidden="true"> 
+                              ×</span> 
+                        </button> 
+                    </div> 
+                    <!-- MODEL BODY -->
+                    <div class="modal-body"> 
+                        <div class="MGclass" 
+                             id="chartdiv"></div> 
+                        <div class="MGclass" 
+                             id="chartdivtestId"></div> 
+                        <div class="modal-footer"> 
+                 <!-- closing button of the modal -->
+                            <button type="button"
+                                    class="btn btn-secondary" 
+                                    data-dismiss="modal"> 
+                              Close</button> 
+                        </div> 
+                    </div> 
+                </div> 
+            </div> 
+        </div> 
+
+
+
+   <style>
+  .table-serious-warning, .table-serious-warning>td, .table-serious-warning>th {
+    background-color: #ffc107;
+}
+</style>
+  <script type="text/javascript"> 
+         var mydata=[] ;
+         var dataTimeMeasurement =[];
+         var testName=[] ;
+         
+         $.when(
+                $.ajax({
+                        async: false,
+                        type: "GET",
+                        url: "aggregated_measurements.json",
+                        dataType: "json",
+                        success : function(data) {
+                                        mydata = data;
+                                    },
+                         error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                                  alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+                                 } 
+                        }) ,
+                   
+
+                $.ajax({
+                        async: false,
+                        type: "GET",
+                        url: "measurements.json",
+                        dataType: "json",
+                        success : function(data) {
+                                        dataTimeMeasurement = data;
+                                    },                    
+                        error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                                  alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+                                 } 
+                        }) , 
+
+                        $.ajax({
+                        async: false,
+                        type: "GET",
+                        url: "tests.json",
+                        dataType: "json",
+                        success : function(data) {
+                                        testName = data;
+                                    },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                                     alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+                                    }  
+                        }) 
+
+
+    ).done(function() {
+
+        mydata.forEach(function (row, index)
+        {
+
+            testName.forEach(function (rowtest, indextest){
+                if(row.test_id ==rowtest.test_id){
+                    mydata[index]["testName"]= rowtest.test_name;
+                }
+            });
+
+        });
+        $(document).ready(function () { 
+    
+            // Use the given data to create  
+            // the table and display it 
+            $('table').bootstrapTable({ 
+                    data: mydata,
+            }); 
+        }); 
+
+        $(function() {
+            $('td:first-child').addClass("firstChild");
+            $(' td:first-child + td').addClass("secondChild");
+            $(' td:first-child + td + td').addClass("thirdChild");
+            $(' td:first-child + td + td + td').addClass("fourthChild");
+                   
+        });
+        $(document).ready(function () { 
+                            //setting in danger , serious warning ,warning and success Cell background color
+                           $('.secondChild').each(function(){
+                                var a = 
+                                 $(this).text(); 
+                                 if( a >=150 && a<=200)
+                                     $(this).addClass("table-danger") ;
+                                 if(a >=100 && a<=149)    
+                                    $(this).addClass("table-serious-warning") ;
+                                 if(a >=50 && a<=99)    
+                                    $(this).addClass("table-warning") ;
+                                 if(a >=0 && a<=49)    
+                                    $(this).addClass("table-success") ;
+
+                           });
+
+                           $('.thirdChild').each(function(){
+                                var a = 
+                                 $(this).text(); 
+                                 if( a >=150 && a<=200)
+                                     $(this).addClass("table-danger") ;
+                                 if(a >=100 && a<=149)    
+                                    $(this).addClass("table-serious-warning") ;
+                                 if(a >=50 && a<=99)    
+                                    $(this).addClass("table-warning") ;
+                                 if(a >=0 && a<=49)    
+                                    $(this).addClass("table-success") ;
+
+                           });
+
+
+                            $('.fourthChild').each(function(){
+                                var a = 
+                                 $(this).text(); 
+                                 if( a >=150 && a<=200)
+                                     $(this).addClass("table-danger") ;
+                                 if(a >=100 && a<=149)    
+                                    $(this).addClass("table-serious-warning") ;
+                                 if(a >=50 && a<=99)    
+                                    $(this).addClass("table-warning") ;
+                                 if(a >=0 && a<=49)    
+                                    $(this).addClass("table-success") ;
+
+                           });
+                         
+     });
+
+            $(function () { 
+
+                $(function(){
+                    $('.table tr').each(function(){
+                        $(this).css('cursor','pointer').hover(
+                            function(){ 
+                                $(this).addClass('active'); 
+                                $(this).attr("data-toggle",'modal')
+                                $(this).attr("data-target",'#gfgmodal')
+                            },  
+                            function(){ 
+                                $(this).removeClass('active'); 
+                            }).click( function(){ 
+                              //      FINDING ELEMENTS OF ROWS AND STORING THEM IN VARIABLES 
+                               var testNameFromForm = 
+                              $(this).find(".firstChild").text(); 
+                            
+                                var p = ""; 
+                                // CREATING DATA TO SHOW ON MODEL 
+                                p +=  
+                                    "<p id='testName' name='testName' >Test Name: " 
+                                    + testNameFromForm + " </p>"; 
+                               // CLEARING THE PREFILLED DATA 
+                               $("#chartdivtestId").empty(); 
+                              //  WRITING THE DATA ON MODEL 
+                               $("#chartdivtestId").append(p); 
+                            });
+                    });
+                });
+
+            }); 
+ 
+
+
+    <!-- Chart code -->
+
+    am4core.ready(function() {
+
+    // Themes begin
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+
+    var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+
+    var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+                                 dateAxis.baseInterval = {
+                                "timeUnit": "hour",
+                                "count": 1
+                                 };
+
+                                var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                                valueAxis.title.text = "Values";
+
+                                var series = chart.series.push(new am4charts.LineSeries());
+                                series.dataFields.dateX = "time";
+                                series.dataFields.valueY = "value";                              
+                                series.fillOpacity = 0.3;
+
+                                chart.cursor = new am4charts.XYCursor();
+                                chart.cursor.lineY.opacity = 0;
+                                chart.scrollbarX = new am4charts.XYChartScrollbar();
+                                chart.scrollbarX.series.push(series);
+                                dateAxis.keepSelection = true;
+
+                $(function(){
+                    $('.table tr').each(function(){
+                        $(this).css('cursor','pointer').hover(
+                            function(){ 
+                            },  
+                            function(){ 
+
+                            }).click( function(){
+                                var testID; 
+                              //      FINDING ELEMENTS OF ROWS AND STORING THEM IN VARIABLES 
+                                var testNameFromForm = 
+                              $(this).find(".firstChild").text(); 
+                                    testName.forEach(function (rowtest, indextest){
+                                        if(rowtest.test_name ==testNameFromForm){
+                                        testID = rowtest.test_id;
+                                        }
+                               });
+
+                              var newData = dataTimeMeasurement[testID-1].measurements;
+                               
+                                newData.forEach(function (row, index) {
+                                row.time = new Date(row.time);
+                                newData[index] = row;
+                                });
+                                
+                                chart.data =newData ;
+                          });
+                    });
+                });
+
+
+    }); // end am4core.ready()
+
+
+});
+
+</script>
+
+</body> 
+</html>
